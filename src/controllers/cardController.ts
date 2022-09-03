@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
+import { ParsedUrlQuery } from "querystring";
 import { TransactionTypes } from "../repositories/cardRepository.js";
 import * as cardService from "../services/cardService.js"
+import QueryString from "qs";
 
 export async function newCard(req:Request, res:Response){
     const { apiKey } : { apiKey: string } = res.locals.apiKey
@@ -10,3 +12,12 @@ export async function newCard(req:Request, res:Response){
     await cardService.createCard(apiKey, userId, type);
     res.sendStatus(201);
 };
+
+export async function activation(req:Request, res:Response){
+    const { apiKey } : { apiKey: string } = res.locals.apiKey
+    const { cardId } = req.query;
+    const { userId, password, CVC } : { userId: number, password: string, CVC:string } = req.body;
+    if(!cardId || !userId || !password || !CVC) return res.sendStatus(422);
+
+    await cardService.cardActivation(apiKey,cardId, userId, password, CVC);
+}
