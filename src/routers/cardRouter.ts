@@ -1,7 +1,8 @@
 import { Router } from "express";
+import * as cardController from "../controllers/cardController.js"
 
 const cardRouter = Router();
 
-//cardRouter.use()
+cardRouter.post("/card/create", cardController.newCard)
 
 export default cardRouter;
