@@ -2,14 +2,18 @@ import { TransactionTypes } from "../repositories/cardRepository.js";
 import { findByApiKey } from "../repositories/companyRepository.js";
 import { findById } from "../repositories/employeeRepository.js";
 import * as cardRepository from "../repositories/cardRepository.js";
+import { faker } from "@faker-js/faker";
 
 //Services
     //#Create Card Service
     export async function createCard(apiKey:string, employeeId:number, type:TransactionTypes){
-        await findByApiKey(apiKey);
-        const employee = await validateEmployee(employeeId);
+        await validateCompany(apiKey);
+
+        const employeeFullName = await validateEmployee(employeeId);
+
         await validateEmployeeNewCardType(type, employeeId);
-        
+
+        const employeeCard = employeeCardName(employeeFullName);
     };
 
 //Validations
@@ -18,11 +22,17 @@ async function validateCompany(apiKey: string){
     if(!company) throw Error("That key don't belong to any company!");
 };
 async function validateEmployee(employeeId:number){
-    const employeer = await findById(employeeId);
+    const employee = await findById(employeeId);
     //Verificar se ele pertence a empresa!
-    if(!employeer) throw Error("Only registered employeers can have cards!");
+    if(!employee) throw Error("Only registered employeers can have cards!");
+    return employee["fullName"];
 };
 async function validateEmployeeNewCardType(cardType:any, employeeId:number){
     const employeerCardboard = await cardRepository.findByTypeAndEmployeeId(cardType, employeeId);
     if(employeerCardboard) throw Error("Already have that type of card!");
 };
+
+//Generate Card
+function employeeCardName(employeeFullName:string){
+    
+}
