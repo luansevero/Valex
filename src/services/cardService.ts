@@ -63,11 +63,13 @@ export async function cardActivation(apiKey:string, cardId: string | QueryString
 
     validateCardExpiration(card["expirationDate"]);
 
-    // validateCardSecurityCode();
+    validateCardSecurityCode(card["securityCode"], CVC);
 
-    // await generateCardPassword();
+    await generateCardPassword();
 
 }
+    //Generate Card Password
+    async function generateCardPassword()
 
 
 //Validations
@@ -95,5 +97,9 @@ async function validateCardExpiration(expirationDate: string){
     const expiration : any = dayjs(expirationDate).format("MM-YYYY");
     if(expiration.diff(actualDate, 'month') <= 0) throw Error("That card is expired");
 };
+async function validateCardSecurityCode(securityCode:string, CVC:string){
+    const decryptedSecurityCode : string = cryptr.decrypt(securityCode);
+    if(decryptedSecurityCode !== CVC) throw Error("Wrong card data");
+}
 
 
