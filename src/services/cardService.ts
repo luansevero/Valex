@@ -9,6 +9,7 @@ import * as cardRepository from "../repositories/cardRepository.js";
 
 import validateCompany from "../validators/companyValidator.js";
 import * as employeeValidator from "../validators/employeeValidator.js";
+import * as cardValidator from "../validators/cardValidator.js";
 
 
 
@@ -22,43 +23,43 @@ export async function createCard(apiKey:string, employeeId:number, type:Transact
 
     const employee : employeeRepository.Employee = await employeeValidator.employee(employeeId);
 
-    // await validateEmployeeNewCardType(type, employeeId);
+    await cardValidator.type(type, employeeId);
 
-    // await generateCard(employee["fullName"], employeeId, type);
+    await generateCard(employee["fullName"], employeeId, type);
 };
-//     //Generate Card
-//     function employeeCardName(employeeFullName:string){
-//         const employeeCardName : string[] = employeeFullName.split(" ");
-//         if(employeeCardName.length > 2){
-//             return  employeeCardName
-//                     .filter(name => name[0].length > 3 && name[0] === name[0].toUpperCase())
-//                     .map((name, index, array) => index!==0 || index !== array.length - 1 ? name[0] : name)
-//                     .join(" ")
-//         };
-//         return  employeeFullName
-//     }
-//     function generateSecurityCode(){
-//         const securityCode : string = faker.finance.creditCardCVV();
-//         const encryptSecuritCode : string = cryptr.encrypt(securityCode);
-//         return encryptSecuritCode
-//     }
-//     async function generateCard(employeeFullName:string, employeeId:number, type:TransactionTypes){
-//         const number : string = faker.finance.creditCardNumber('visa');
-//         const cardholderName : string = employeeCardName(employeeFullName);
-//         const securityCode : string = generateSecurityCode();
-//         const expirationDate : string = dayjs().add(5, "year").format("MM/YYYY");
+    //Generate Card
+    function employeeCardName(employeeFullName:string){
+        const employeeCardName : string[] = employeeFullName.split(" ");
+        if(employeeCardName.length > 2){
+            return  employeeCardName
+                    .filter(name => name[0].length > 3 && name[0] === name[0].toUpperCase())
+                    .map((name, index, array) => index!==0 || index !== array.length - 1 ? name[0] : name)
+                    .join(" ")
+        };
+        return  employeeFullName
+    }
+    function generateSecurityCode(){
+        const securityCode : string = faker.finance.creditCardCVV();
+        const encryptSecuritCode : string = cryptr.encrypt(securityCode);
+        return encryptSecuritCode
+    }
+    async function generateCard(employeeFullName:string, employeeId:number, type:TransactionTypes){
+        const number : string = faker.finance.creditCardNumber('visa');
+        const cardholderName : string = employeeCardName(employeeFullName);
+        const securityCode : string = generateSecurityCode();
+        const expirationDate : string = dayjs().add(5, "year").format("MM/YYYY");
 
-//         await cardRepository.insert({
-//             employeeId,
-//             number,
-//             cardholderName,
-//             securityCode,
-//             expirationDate,
-//             isVirtual:false,
-//             isBlocked:true,
-//             type
-//         });
-//     }
+        await cardRepository.insert({
+            employeeId,
+            number,
+            cardholderName,
+            securityCode,
+            expirationDate,
+            isVirtual:false,
+            isBlocked:true,
+            type
+        });
+    }
 // //#Card activation service
 // export async function cardActivation(apiKey:string, cardId: string | QueryString.ParsedQs | string[] | QueryString.ParsedQs[], employeeId:number, password:string, CVC:string){
 //     await validateCompany(apiKey);
@@ -82,11 +83,6 @@ export async function createCard(apiKey:string, employeeId:number, type:Transact
 
 // //Validations
 
-
-// async function validateEmployeeNewCardType(cardType:any, employeeId:number){
-//     const employeerCardboard : cardRepository.Card = await cardRepository.findByTypeAndEmployeeId(cardType, employeeId);
-//     if(employeerCardboard) throw Error("Already have that type of card!");
-// };
 // //Validations - Activation
 // async function validateEmployeeCard(cardId:string | QueryString.ParsedQs | string[] | QueryString.ParsedQs[], employeeId:number ) {
 //     const card : cardRepository.Card = await cardRepository.findById(Number(cardId));
