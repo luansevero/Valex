@@ -1,12 +1,17 @@
-import { TransactionTypes } from "../repositories/cardRepository.js";
-import validateCompany from "../middlewares/verifyCompany.js";
-
-import * as employeeRepository from "../repositories/employeeRepository.js";
-import * as cardRepository from "../repositories/cardRepository.js";
 import { faker } from "@faker-js/faker";
 import Cryptr from "cryptr";
 import dayjs from 'dayjs';
 import QueryString from "qs";
+
+import { TransactionTypes } from "../repositories/cardRepository.js";
+import * as employeeRepository from "../repositories/employeeRepository.js";
+import * as cardRepository from "../repositories/cardRepository.js";
+
+import validateCompany from "../validators/companyValidator.js";
+import * as employeeValidator from "../validators/employeeValidator.js";
+
+
+
 
 const cryptr = new Cryptr(process.env.CRYPTR_KEY);
 
@@ -15,7 +20,7 @@ const cryptr = new Cryptr(process.env.CRYPTR_KEY);
 export async function createCard(apiKey:string, employeeId:number, type:TransactionTypes){
     await validateCompany(apiKey);
 
-    // const employee : employeeRepository.Employee = await validateEmployee(employeeId);
+    const employee : employeeRepository.Employee = await employeeValidator.employee(employeeId);
 
     // await validateEmployeeNewCardType(type, employeeId);
 
@@ -77,12 +82,7 @@ export async function createCard(apiKey:string, employeeId:number, type:Transact
 
 // //Validations
 
-// async function validateEmployee(employeeId:number){
-//     const employee : employeeRepository.Employee = await employeeRepository.findById(employeeId);
-//     //Verificar se ele pertence a empresa!
-//     if(!employee) throw Error("Only registered employeers can have cards!");
-//     return employee
-// };
+
 // async function validateEmployeeNewCardType(cardType:any, employeeId:number){
 //     const employeerCardboard : cardRepository.Card = await cardRepository.findByTypeAndEmployeeId(cardType, employeeId);
 //     if(employeerCardboard) throw Error("Already have that type of card!");
