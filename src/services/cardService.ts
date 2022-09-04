@@ -75,12 +75,13 @@ export async function cardActivation(apiKey:string, cardId: string | QueryString
 
     cardValidator.passwordSize(password);
 
-    // await generateCardPassword();
+    await generateCardPassword(card["id"], password);
 
 }
-//     //Generate Card Password
-//     // async function generateCardPassword(){
-
-//     // }
+//Generate Card Password
+async function generateCardPassword(cardId:number, password:string){
+    const encryptPassword : string = cryptr.encrypt(password);
+    await cardRepository.update(cardId, password);
+}
 
 
