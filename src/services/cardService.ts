@@ -84,18 +84,8 @@ export async function createCard(apiKey:string, employeeId:number, type:Transact
 // //Validations
 
 // //Validations - Activation
-// async function validateEmployeeCard(cardId:string | QueryString.ParsedQs | string[] | QueryString.ParsedQs[], employeeId:number ) {
-//     const card : cardRepository.Card = await cardRepository.findById(Number(cardId));
-//     if(card.employeeId !== employeeId) throw Error("That card don't belong to u!");
-// }
-// async function validateCardExpiration(expirationDate: string){
-//     const actualDate : any = dayjs().format("MM-YYYY");
-//     const expiration : any = dayjs(expirationDate).format("MM-YYYY");
-//     if(expiration.diff(actualDate, 'month') <= 0) throw Error("That card is expired");
-// };
-// async function validateCardSecurityCode(securityCode:string, CVC:string){
-//     const decryptedSecurityCode : string = cryptr.decrypt(securityCode);
-//     if(decryptedSecurityCode !== CVC) throw Error("Wrong card data");
-// }
+
+
+
 
 
