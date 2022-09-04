@@ -29,3 +29,11 @@ export async function securityCode(securityCode:string, CVC:string){
     const decryptedSecurityCode : string = cryptr.decrypt(securityCode);
     if(decryptedSecurityCode !== CVC) throw Error("Wrong card data");
 };
+
+export async function isActive(password:string){
+    if(password) throw Error("This card is already active");
+};
+
+export async function passwordSize(password:string){
+    if(password.length !== 4) throw Error("That password is invalid");
+}

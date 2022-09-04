@@ -27,8 +27,7 @@ export async function createCard(apiKey:string, employeeId:number, type:Transact
 
     await generateCard(employee["fullName"], employeeId, type);
 };
-    //Generate Card
-    function employeeCardName(employeeFullName:string){
+function employeeCardName(employeeFullName:string){
         const employeeCardName : string[] = employeeFullName.split(" ");
         if(employeeCardName.length > 2){
             return  employeeCardName
@@ -38,12 +37,12 @@ export async function createCard(apiKey:string, employeeId:number, type:Transact
         };
         return  employeeFullName
     }
-    function generateSecurityCode(){
+function generateSecurityCode(){
         const securityCode : string = faker.finance.creditCardCVV();
         const encryptSecuritCode : string = cryptr.encrypt(securityCode);
         return encryptSecuritCode
     }
-    async function generateCard(employeeFullName:string, employeeId:number, type:TransactionTypes){
+async function generateCard(employeeFullName:string, employeeId:number, type:TransactionTypes){
         const number : string = faker.finance.creditCardNumber('visa');
         const cardholderName : string = employeeCardName(employeeFullName);
         const securityCode : string = generateSecurityCode();
@@ -59,7 +58,7 @@ export async function createCard(apiKey:string, employeeId:number, type:Transact
             isBlocked:true,
             type
         });
-    }
+ }
 //#Card activation service
 export async function cardActivation(apiKey:string, cardId: string | QueryString.ParsedQs | string[] | QueryString.ParsedQs[], employeeId:number, password:string, CVC:string){
     await validateCompany(apiKey);
@@ -70,7 +69,11 @@ export async function cardActivation(apiKey:string, cardId: string | QueryString
 
     cardValidator.expiration(card["expirationDate"]);
 
+    cardValidator.isActive(card["password"]);
+
     cardValidator.securityCode(card["securityCode"], CVC);
+
+    cardValidator.passwordSize(password);
 
     // await generateCardPassword();
 
