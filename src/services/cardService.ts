@@ -2,6 +2,7 @@ import { faker } from "@faker-js/faker";
 import Cryptr from "cryptr";
 import dayjs from 'dayjs';
 import QueryString from "qs";
+import dotenv from "dotenv";
 
 import { TransactionTypes } from "../repositories/cardRepository.js";
 import * as employeeRepository from "../repositories/employeeRepository.js";
@@ -11,8 +12,7 @@ import validateCompany from "../validators/companyValidator.js";
 import * as employeeValidator from "../validators/employeeValidator.js";
 import * as cardValidator from "../validators/cardValidator.js";
 
-
-
+dotenv.config();
 
 const cryptr = new Cryptr(process.env.CRYPTR_KEY);
 
@@ -60,32 +60,24 @@ export async function createCard(apiKey:string, employeeId:number, type:Transact
             type
         });
     }
-// //#Card activation service
-// export async function cardActivation(apiKey:string, cardId: string | QueryString.ParsedQs | string[] | QueryString.ParsedQs[], employeeId:number, password:string, CVC:string){
-//     await validateCompany(apiKey);
+//#Card activation service
+export async function cardActivation(apiKey:string, cardId: string | QueryString.ParsedQs | string[] | QueryString.ParsedQs[], employeeId:number, password:string, CVC:string){
+    await validateCompany(apiKey);
 
-//     await validateEmployee(employeeId);
+    await employeeValidator.employee(employeeId);
 
-//     const card : cardRepository.Card = await validateEmployeeCard(cardId, employeeId);
+    const card : cardRepository.Card = await cardValidator.employeeCard(cardId, employeeId);
 
-//     validateCardExpiration(card["expirationDate"]);
+    cardValidator.expiration(card["expirationDate"]);
 
-//     validateCardSecurityCode(card["securityCode"], CVC);
+    cardValidator.securityCode(card["securityCode"], CVC);
 
-//     await generateCardPassword();
+    // await generateCardPassword();
 
-// }
+}
 //     //Generate Card Password
 //     // async function generateCardPassword(){
 
 //     // }
-
-
-// //Validations
-
-// //Validations - Activation
-
-
-
 
 
