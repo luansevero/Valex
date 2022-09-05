@@ -1,10 +1,8 @@
 import { faker } from "@faker-js/faker";
 import Cryptr from "cryptr";
 import dayjs from 'dayjs';
-import QueryString from "qs";
 import dotenv from "dotenv";
 
-import { TransactionTypes } from "../repositories/cardRepository.js";
 import * as employeeRepository from "../repositories/employeeRepository.js";
 import * as cardRepository from "../repositories/cardRepository.js";
 import { cardBalance } from "../repositories/cardBalanceRepository.js";
@@ -13,6 +11,7 @@ import * as rechargeRepository from "../repositories/rechargeRepository.js";
 import validateCompany from "../validators/companyValidator.js";
 import * as employeeValidator from "../validators/employeeValidator.js";
 import * as cardValidator from "../validators/cardValidator.js";
+import * as businessValidator from "../validators/businessValidator.js";
 
 
 dotenv.config();
@@ -21,7 +20,7 @@ const cryptr = new Cryptr(process.env.CRYPTR_KEY);
 
 // Services
 // #Create Card Service
-export async function createCard(apiKey: string, employeeId: number, type: TransactionTypes) {
+export async function createCard(apiKey: string, employeeId: number, type: cardRepository.TransactionTypes) {
     console.log("Oi")
     await validateCompany(apiKey);
     const employee: employeeRepository.Employee = await employeeValidator.employee(employeeId);
@@ -45,7 +44,7 @@ function generateSecurityCode() {
     const encryptSecuritCode: string = cryptr.encrypt(securityCode);
     return encryptSecuritCode
 }
-async function generateCard(employeeFullName: string, employeeId: number, type: TransactionTypes) {
+async function generateCard(employeeFullName: string, employeeId: number, type: cardRepository.TransactionTypes) {
     const number: string = faker.finance.creditCardNumber('visa');
     const cardholderName: string = employeeCardName(employeeFullName);
     const securityCode: string = generateSecurityCode();
@@ -142,5 +141,9 @@ export async function transaction(cardId:number, password:string, businessId:num
 
     await cardValidator.confirmPassword(card["password"], password);
 
+    const businessType : cardRepository.TransactionTypes = await businessValidator.registered(businessId);
+
+    if(businessType !== card["type"]) throw Error("Not the same type");
+    
     
 }
