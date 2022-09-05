@@ -5,10 +5,9 @@ export default function verifyApiKey(req:Request, res:Response, next:NextFunctio
     if(apiKey === "" || !apiKey){
         throw{
             type: "erro_missing_api_key",
-            messae: "Api key missing"
+            message: "Api key missing"
         }
     };
-
     res.locals.apiKey = apiKey;
     next();
 }

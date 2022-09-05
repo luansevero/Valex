@@ -18,54 +18,54 @@ const cryptr = new Cryptr(process.env.CRYPTR_KEY);
 
 // Services
 // #Create Card Service
-export async function createCard(apiKey:string, employeeId:number, type:TransactionTypes){
+export async function createCard(apiKey: string, employeeId: number, type: TransactionTypes) {
+    console.log("Oi")
     await validateCompany(apiKey);
+    // const employee: employeeRepository.Employee = await employeeValidator.employee(employeeId);
 
-    const employee : employeeRepository.Employee = await employeeValidator.employee(employeeId);
+    // await cardValidator.type(type, employeeId);
 
-    await cardValidator.type(type, employeeId);
-
-    await generateCard(employee["fullName"], employeeId, type);
+    // await generateCard(employee["fullName"], employeeId, type);
 };
-function employeeCardName(employeeFullName:string){
-        const employeeCardName : string[] = employeeFullName.split(" ");
-        if(employeeCardName.length > 2){
-            return  employeeCardName
-                    .filter(name => name[0].length > 3 && name[0] === name[0].toUpperCase())
-                    .map((name, index, array) => index!==0 || index !== array.length - 1 ? name[0] : name)
-                    .join(" ")
-        };
-        return  employeeFullName
-    }
-function generateSecurityCode(){
-        const securityCode : string = faker.finance.creditCardCVV();
-        const encryptSecuritCode : string = cryptr.encrypt(securityCode);
-        return encryptSecuritCode
-    }
-async function generateCard(employeeFullName:string, employeeId:number, type:TransactionTypes){
-        const number : string = faker.finance.creditCardNumber('visa');
-        const cardholderName : string = employeeCardName(employeeFullName);
-        const securityCode : string = generateSecurityCode();
-        const expirationDate : string = dayjs().add(5, "year").format("MM/YYYY");
+// function employeeCardName(employeeFullName: string) {
+//     const employeeCardName: string[] = employeeFullName.split(" ");
+//     if (employeeCardName.length > 2) {
+//         return employeeCardName
+//             .filter(name => name[0].length > 3 && name[0] === name[0].toUpperCase())
+//             .map((name, index, array) => index !== 0 || index !== array.length - 1 ? name[0] : name)
+//             .join(" ")
+//     };
+//     return employeeFullName
+// }
+// function generateSecurityCode() {
+//     const securityCode: string = faker.finance.creditCardCVV();
+//     const encryptSecuritCode: string = cryptr.encrypt(securityCode);
+//     return encryptSecuritCode
+// }
+// async function generateCard(employeeFullName: string, employeeId: number, type: TransactionTypes) {
+//     const number: string = faker.finance.creditCardNumber('visa');
+//     const cardholderName: string = employeeCardName(employeeFullName);
+//     const securityCode: string = generateSecurityCode();
+//     const expirationDate: string = dayjs().add(5, "year").format("MM/YYYY");
 
-        await cardRepository.insert({
-            employeeId,
-            number,
-            cardholderName,
-            securityCode,
-            expirationDate,
-            isVirtual:false,
-            isBlocked:true,
-            type
-        });
- }
+//     await cardRepository.insert({
+//         employeeId,
+//         number,
+//         cardholderName,
+//         securityCode,
+//         expirationDate,
+//         isVirtual: false,
+//         isBlocked: true,
+//         type
+//     });
+// };
 //#Card activation service
-export async function cardActivation(apiKey:string, cardId: string | QueryString.ParsedQs | string[] | QueryString.ParsedQs[], employeeId:number, password:string, CVC:string){
+export async function cardActivation(apiKey: string, cardId: string | QueryString.ParsedQs | string[] | QueryString.ParsedQs[], employeeId: number, password: string, CVC: string) {
     await validateCompany(apiKey);
 
     await employeeValidator.employee(employeeId);
 
-    const card : cardRepository.Card = await cardValidator.employeeCard(cardId, employeeId);
+    const card: cardRepository.Card = await cardValidator.employeeCard(cardId, employeeId);
 
     cardValidator.expiration(card["expirationDate"]);
 
@@ -77,11 +77,11 @@ export async function cardActivation(apiKey:string, cardId: string | QueryString
 
     await generateCardPassword(card["id"], password);
 
-}
+};
 //Generate Card Password
-async function generateCardPassword(cardId:number, password:string){
-    const encryptPassword : string = cryptr.encrypt(password);
-    await cardRepository.update(cardId, password);
-}
+async function generateCardPassword(cardId: number, password: string) {
+    const encryptPassword: string = cryptr.encrypt(password);
+    await cardRepository.update(cardId, { password: encryptPassword });
+};
 
 
