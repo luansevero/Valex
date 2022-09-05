@@ -48,10 +48,10 @@ export async function status(isBlocked:boolean, toBlock:boolean){
 export async function confirmPassword(cardPassword:string, password:string){
     const decryptedPassword : string = cryptr.decrypt(cardPassword);
     if(decryptedPassword !== password) throw Error("Wrong card data");
-}
+};
 
 export async function registered(cardId:number){
     const card : cardRepository.Card = await cardRepository.findById(cardId);
     if(!card) throw Error("This card doesn't exist");
     return card
-}
+};
