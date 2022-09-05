@@ -5,8 +5,9 @@ import dotenv from "dotenv";
 
 import * as employeeRepository from "../repositories/employeeRepository.js";
 import * as cardRepository from "../repositories/cardRepository.js";
-import { cardBalance } from "../repositories/cardBalanceRepository.js";
+import * as cardBalanceRepository from "../repositories/cardBalanceRepository.js";
 import * as rechargeRepository from "../repositories/rechargeRepository.js";
+import * as paymentRepository from "../repositories/paymentRepository.js"
 
 import validateCompany from "../validators/companyValidator.js";
 import * as employeeValidator from "../validators/employeeValidator.js";
@@ -112,7 +113,7 @@ export async function balance(apiKey:string, cardId:number , employeeId: number)
 
     await employeeValidator.employee(employeeId);
 
-    return await cardBalance(cardId);
+    return await cardBalanceRepository.cardBalance(cardId);
 }
 
 //Recharge
@@ -145,5 +146,9 @@ export async function transaction(cardId:number, password:string, businessId:num
 
     if(businessType !== card["type"]) throw Error("Not the same type");
     
-    
+    const cardAmount : number = await cardBalanceRepository.amount(cardId);
+
+    if(cardAmount < amount) throw Error("Insufficient balance");
+
+    await paymentRepository.insert({cardId, businessId, amount})
 }
