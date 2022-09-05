@@ -19,7 +19,7 @@ export async function activation(req:Request, res:Response){
     const { userId, password, CVC } : { userId: number, password: string, CVC:string } = req.body;
     if(!cardId || !userId || !password || !CVC) return res.sendStatus(422);
 
-    await cardService.cardActivation(apiKey,cardId, userId, password, CVC);
+    await cardService.cardActivation(apiKey,Number(cardId), userId, password, CVC);
     res.sendStatus(200)
 };
 
@@ -29,5 +29,15 @@ export async function toggleCardStatus(req:Request, res:Response){
     const { userId, password, toBlock } : { userId: number, password: string, toBlock:boolean }  = req.body;
     if(!cardId || !userId || !password ) return res.sendStatus(422);
 
-    await cardService.toggleBlockedCard(apiKey,cardId, userId, password, toBlock)
+    await cardService.toggleBlockedCard(apiKey,Number(cardId), userId, password, toBlock)
+};
+
+export async function balance(req:Request, res:Response){
+    const { apiKey } = res.locals;
+    const { cardId, userId } = req.query;
+    if(!cardId || !userId) return res.sendStatus(422);
+
+    const balance : any = await cardService.balance(apiKey, Number(cardId), Number(userId));
+
+    res.status(200).send(balance);
 }
