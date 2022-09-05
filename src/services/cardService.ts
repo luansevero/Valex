@@ -84,4 +84,25 @@ async function generateCardPassword(cardId: number, password: string) {
     await cardRepository.update(cardId, { password: encryptPassword });
 };
 
+//Block Card;
+export async function blockCard(apiKey: string, cardId:string | QueryString.ParsedQs | string[] | QueryString.ParsedQs[], employeeId: number, password: string){
+    await validateCompany(apiKey);
+
+    await employeeValidator.employee(employeeId);
+
+    const card: cardRepository.Card = await cardValidator.employeeCard(cardId, employeeId);
+
+    cardValidator.expiration(card["expirationDate"]);
+
+    cardValidator.isBlocked(card["isBlocked"]);
+
+    cardValidator.confirmPassword(card["password"], password);
+
+    await blockEmployeeCard(Number(cardId))
+}
+
+async function blockEmployeeCard(cardId:number){
+    await cardRepository.update(cardId, {isBlocked: false})
+}
+
 

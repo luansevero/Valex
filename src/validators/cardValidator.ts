@@ -3,7 +3,6 @@ import Cryptr from "cryptr";
 import dayjs from 'dayjs';
 import dotenv from "dotenv";
 import * as cardRepository from "../repositories/cardRepository.js";
-import errorHandling from "../middlewares/errorHandlingMiddleware.js";
 
 dotenv.config();
 
@@ -38,3 +37,12 @@ export async function isActive(password:string){
 export async function passwordSize(password:string){
     if(password.length !== 4) throw Error("That password is invalid");
 };
+
+export async function isBlocked(isBlocked:boolean){
+    if(isBlocked) throw Error("Already blocked");
+};
+
+export async function confirmPassword(cardPassword:string, password:string){
+    const decryptedPassword : string = cryptr.decrypt(cardPassword);
+    if(decryptedPassword !== password) throw Error("Wrong card data");
+}
