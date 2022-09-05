@@ -11,7 +11,6 @@ import * as cardRepository from "../repositories/cardRepository.js";
 import validateCompany from "../validators/companyValidator.js";
 import * as employeeValidator from "../validators/employeeValidator.js";
 import * as cardValidator from "../validators/cardValidator.js";
-import { number } from "joi";
 
 dotenv.config();
 
