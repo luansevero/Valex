@@ -1,3 +1,4 @@
+import { number } from "joi";
 import { connection } from "../setup/database.js";
 
 export async function cardBalance(cardId:number){
@@ -39,4 +40,17 @@ export async function cardBalance(cardId:number){
         WHERE id = $1
     `, [cardId]);
     return balance;
-}
+};
+
+export async function amount(cardId:number){
+    const {rows:amount} = await connection.query(`
+        SELECT COALESCE(SUM(recharges.amount) - SUM(payments.amount), 0) as balance
+        FROM card
+        JOIN payments
+        ON payments."cardId" = $1
+        JOIN recharges
+        ON recharges."cardId" = $1
+        WHERE id = $1
+    `, [cardId]);
+    return amount["balance"]
+};
