@@ -53,3 +53,11 @@ export async function recharge(req:Request, res:Response){
     res.sendStatus(201);
 };
 
+export async function transaction(req:Request, res:Response){
+    const { cardId, password, businessId, amount } : { cardId:number, password:string, businessId:number, amount:number} = req.body;
+    if(!cardId || !password || !businessId || !amount || amount <= 0) res.sendStatus(422);
+
+    await cardService.transaction(cardId, password businessId, amount);
+
+    res.sendStatus(201);
+}

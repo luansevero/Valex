@@ -128,3 +128,19 @@ export async function recharge(apiKey:string, cardId:number, amount:number){
     
     await rechargeRepository.insert({cardId, amount});
 }
+
+//Transactions
+export async function transaction(cardId:number, password:string, businessId:number, amount:number){
+    
+    const card : cardRepository.Card = await cardValidator.registered(cardId);
+
+    await cardValidator.cardActive(card["password"]);
+
+    await cardValidator.expiration(card["expirationDate"]);
+
+    if(card["isBlocked"]) throw Error(`That card is blocked`);
+
+    await cardValidator.confirmPassword(card["password"], password);
+
+    
+}
