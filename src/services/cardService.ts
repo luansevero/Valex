@@ -8,6 +8,7 @@ import { TransactionTypes } from "../repositories/cardRepository.js";
 import * as employeeRepository from "../repositories/employeeRepository.js";
 import * as cardRepository from "../repositories/cardRepository.js";
 import { cardBalance } from "../repositories/cardBalanceRepository.js";
+import * as rechargeRepository from "../repositories/rechargeRepository.js";
 
 import validateCompany from "../validators/companyValidator.js";
 import * as employeeValidator from "../validators/employeeValidator.js";
@@ -113,4 +114,17 @@ export async function balance(apiKey:string, cardId:number , employeeId: number)
     await employeeValidator.employee(employeeId);
 
     return await cardBalance(cardId);
+}
+
+//Recharge
+export async function recharge(apiKey:string, cardId:number, amount:number){
+    await validateCompany(apiKey);
+
+    const card : cardRepository.Card = await cardValidator.registered(cardId);
+
+    await cardValidator.cardActive(card["password"]);
+
+    await cardValidator.expiration(card["expirationDate"]);
+    
+    await rechargeRepository.insert({cardId, amount});
 }

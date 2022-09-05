@@ -33,6 +33,9 @@ export async function securityCode(securityCode:string, CVC:string){
 export async function isActive(password:string){
     if(password) throw Error("This card is already active");
 };
+export async function cardActive(password:string){
+    if(!password) throw Error("This card isn't active");
+}
 
 export async function passwordSize(password:string){
     if(password.length !== 4) throw Error("That password is invalid");
@@ -45,4 +48,10 @@ export async function status(isBlocked:boolean, toBlock:boolean){
 export async function confirmPassword(cardPassword:string, password:string){
     const decryptedPassword : string = cryptr.decrypt(cardPassword);
     if(decryptedPassword !== password) throw Error("Wrong card data");
+}
+
+export async function registered(cardId:number){
+    const card : cardRepository.Card = await cardRepository.findById(cardId);
+    if(!card) throw Error("This card doesn't exist");
+    return card
 }

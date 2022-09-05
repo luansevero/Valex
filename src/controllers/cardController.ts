@@ -40,4 +40,16 @@ export async function balance(req:Request, res:Response){
     const balance : any = await cardService.balance(apiKey, Number(cardId), Number(userId));
 
     res.status(200).send(balance);
-}
+};
+
+export async function recharge(req:Request, res:Response){
+    const { apiKey } = res.locals;
+    const { cardId } = req.query;
+    const { amount } : {amount:number} = req.body;
+    if(!amount || amount <= 0 ) return res.sendStatus(422);
+
+    await cardService.recharge(apiKey, Number(cardId), amount);
+
+    res.sendStatus(201);
+};
+
