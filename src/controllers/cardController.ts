@@ -14,10 +14,22 @@ export async function newCard(req:Request, res:Response){
 };
 
 export async function activation(req:Request, res:Response){
-    const { apiKey } : { apiKey: string } = res.locals.apiKey
+    const { apiKey } = res.locals
     const { cardId } = req.query;
     const { userId, password, CVC } : { userId: number, password: string, CVC:string } = req.body;
     if(!cardId || !userId || !password || !CVC) return res.sendStatus(422);
 
     await cardService.cardActivation(apiKey,cardId, userId, password, CVC);
-}
+    res.sendStatus(200)
+};
+
+export async function blockCard(req:Request, res:Response){
+    const { apiKey } = res.locals;
+    const { cardId } = req.query;
+    const { userId, password } : { userId: number, password: string }  = req.body;
+    if(!cardId || !userId || !password ) return res.sendStatus(422);
+
+    await cardService.blockCard(apiKey,cardId, userId, password);
+
+    res.sendStatus(200)
+};
