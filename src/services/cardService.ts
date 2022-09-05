@@ -22,8 +22,9 @@ const cryptr = new Cryptr(process.env.CRYPTR_KEY);
 // Services
 // #Create Card Service
 export async function createCard(apiKey: string, employeeId: number, type: cardRepository.TransactionTypes) {
-    console.log("Oi")
+
     await validateCompany(apiKey);
+
     const employee: employeeRepository.Employee = await employeeValidator.employee(employeeId);
 
     await cardValidator.type(type, employeeId);
@@ -33,10 +34,7 @@ export async function createCard(apiKey: string, employeeId: number, type: cardR
 function employeeCardName(employeeFullName: string) {
     const employeeCardName: string[] = employeeFullName.split(" ");
     if (employeeCardName.length > 2) {
-        return employeeCardName
-            .filter(name => name[0].length > 3 && name[0] === name[0].toUpperCase())
-            .map((name, index, array) => index !== 0 || index !== array.length - 1 ? name[0] : name)
-            .join(" ")
+        return employeeCardName.filter(name => name.length > 3 && name[0] === name[0].toUpperCase()).map((name, index, array) => index === 0 || index === array.length - 1 ? name : name[0]).join(" ")
     };
     return employeeFullName
 }
@@ -50,7 +48,6 @@ async function generateCard(employeeFullName: string, employeeId: number, type: 
     const cardholderName: string = employeeCardName(employeeFullName);
     const securityCode: string = generateSecurityCode();
     const expirationDate: string = dayjs().add(5, "year").format("MM/YYYY");
-
     await cardRepository.insert({
         employeeId,
         number,
