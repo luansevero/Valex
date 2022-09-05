@@ -7,10 +7,12 @@ import dotenv from "dotenv";
 import { TransactionTypes } from "../repositories/cardRepository.js";
 import * as employeeRepository from "../repositories/employeeRepository.js";
 import * as cardRepository from "../repositories/cardRepository.js";
+import { cardBalance } from "../repositories/cardBalanceRepository.js";
 
 import validateCompany from "../validators/companyValidator.js";
 import * as employeeValidator from "../validators/employeeValidator.js";
 import * as cardValidator from "../validators/cardValidator.js";
+
 
 dotenv.config();
 
@@ -60,7 +62,7 @@ async function generateCard(employeeFullName: string, employeeId: number, type: 
     });
 };
 //#Card activation service
-export async function cardActivation(apiKey: string, cardId: string | QueryString.ParsedQs | string[] | QueryString.ParsedQs[], employeeId: number, password: string, CVC: string) {
+export async function cardActivation(apiKey: string, cardId: number, employeeId: number, password: string, CVC: string) {
     await validateCompany(apiKey);
 
     await employeeValidator.employee(employeeId);
@@ -85,7 +87,7 @@ async function generateCardPassword(cardId: number, password: string) {
 };
 
 //Block Card && Unblock Card
-export async function toggleBlockedCard(apiKey: string, cardId:string | QueryString.ParsedQs | string[] | QueryString.ParsedQs[], employeeId: number, password: string, toBlock:boolean){
+export async function toggleBlockedCard(apiKey: string, cardId:number, employeeId: number, password: string, toBlock:boolean){
     await validateCompany(apiKey);
 
     await employeeValidator.employee(employeeId);
@@ -104,3 +106,11 @@ async function toggleCardStatus(cardId:number, toBlock:boolean){
     await cardRepository.update(cardId, {isBlocked: toBlock})
 }
 
+//Transactions & Balance
+export async function balance(apiKey:string, cardId:number , employeeId: number){
+    await validateCompany(apiKey);
+
+    await employeeValidator.employee(employeeId);
+
+    return await cardBalance(cardId);
+}

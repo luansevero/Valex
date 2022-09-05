@@ -13,7 +13,7 @@ export async function type(cardType:any, employeeId:number){
     if(employeerCardboard) throw Error("Already have that type of card!");
 };
 
-export async function employeeCard(cardId:string | QueryString.ParsedQs | string[] | QueryString.ParsedQs[], employeeId:number ) {
+export async function employeeCard(cardId:number, employeeId:number ) {
     const card : cardRepository.Card = await cardRepository.findById(Number(cardId));
     if(card.employeeId !== employeeId) throw Error("That card don't belong to u!");
     return card
