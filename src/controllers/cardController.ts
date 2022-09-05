@@ -20,4 +20,5 @@ export async function activation(req:Request, res:Response){
     if(!cardId || !userId || !password || !CVC) return res.sendStatus(422);
 
     await cardService.cardActivation(apiKey,cardId, userId, password, CVC);
+    res.sendStatus(200)
 }
