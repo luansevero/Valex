@@ -23,13 +23,11 @@ export async function activation(req:Request, res:Response){
     res.sendStatus(200)
 };
 
-export async function blockCard(req:Request, res:Response){
+export async function toggleCardStatus(req:Request, res:Response){
     const { apiKey } = res.locals;
     const { cardId } = req.query;
-    const { userId, password } : { userId: number, password: string }  = req.body;
+    const { userId, password, toBlock } : { userId: number, password: string, toBlock:boolean }  = req.body;
     if(!cardId || !userId || !password ) return res.sendStatus(422);
 
-    await cardService.blockCard(apiKey,cardId, userId, password);
-
-    res.sendStatus(200)
-};
+    await cardService.toggleBlockedCard(apiKey,cardId, userId, password, toBlock)
+}
