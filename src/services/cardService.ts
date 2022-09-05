@@ -1,71 +1,87 @@
-import { TransactionTypes } from "../repositories/cardRepository.js";
-import * as companyRepository from "../repositories/companyRepository.js";
-import * as employeeRepository from "../repositories/employeeRepository.js";
-import * as cardRepository from "../repositories/cardRepository.js";
 import { faker } from "@faker-js/faker";
 import Cryptr from "cryptr";
 import dayjs from 'dayjs';
+import QueryString from "qs";
+import dotenv from "dotenv";
+
+import { TransactionTypes } from "../repositories/cardRepository.js";
+import * as employeeRepository from "../repositories/employeeRepository.js";
+import * as cardRepository from "../repositories/cardRepository.js";
+
+import validateCompany from "../validators/companyValidator.js";
+import * as employeeValidator from "../validators/employeeValidator.js";
+import * as cardValidator from "../validators/cardValidator.js";
+
+dotenv.config();
 
 const cryptr = new Cryptr(process.env.CRYPTR_KEY);
 
-//Services
-    //#Create Card Service
-    export async function createCard(apiKey:string, employeeId:number, type:TransactionTypes){
-        await validateCompany(apiKey);
+// Services
+// #Create Card Service
+export async function createCard(apiKey: string, employeeId: number, type: TransactionTypes) {
+    console.log("Oi")
+    await validateCompany(apiKey);
+    // const employee: employeeRepository.Employee = await employeeValidator.employee(employeeId);
 
-        const employee : employeeRepository.Employee = await validateEmployee(employeeId);
+    // await cardValidator.type(type, employeeId);
 
-        await validateEmployeeNewCardType(type, employeeId);
-
-        await generateCard(employee["fullName"], employeeId, type);
-    };
-
-//Validations
-async function validateCompany(apiKey: string){
-    const company : companyRepository.Company = await companyRepository.findByApiKey(apiKey);
-    if(!company) throw Error("That key don't belong to any company!");
+    // await generateCard(employee["fullName"], employeeId, type);
 };
-async function validateEmployee(employeeId:number){
-    const employee : employeeRepository.Employee = await employeeRepository.findById(employeeId);
-    //Verificar se ele pertence a empresa!
-    if(!employee) throw Error("Only registered employeers can have cards!");
-    return employee
+// function employeeCardName(employeeFullName: string) {
+//     const employeeCardName: string[] = employeeFullName.split(" ");
+//     if (employeeCardName.length > 2) {
+//         return employeeCardName
+//             .filter(name => name[0].length > 3 && name[0] === name[0].toUpperCase())
+//             .map((name, index, array) => index !== 0 || index !== array.length - 1 ? name[0] : name)
+//             .join(" ")
+//     };
+//     return employeeFullName
+// }
+// function generateSecurityCode() {
+//     const securityCode: string = faker.finance.creditCardCVV();
+//     const encryptSecuritCode: string = cryptr.encrypt(securityCode);
+//     return encryptSecuritCode
+// }
+// async function generateCard(employeeFullName: string, employeeId: number, type: TransactionTypes) {
+//     const number: string = faker.finance.creditCardNumber('visa');
+//     const cardholderName: string = employeeCardName(employeeFullName);
+//     const securityCode: string = generateSecurityCode();
+//     const expirationDate: string = dayjs().add(5, "year").format("MM/YYYY");
+
+//     await cardRepository.insert({
+//         employeeId,
+//         number,
+//         cardholderName,
+//         securityCode,
+//         expirationDate,
+//         isVirtual: false,
+//         isBlocked: true,
+//         type
+//     });
+// };
+//#Card activation service
+export async function cardActivation(apiKey: string, cardId: string | QueryString.ParsedQs | string[] | QueryString.ParsedQs[], employeeId: number, password: string, CVC: string) {
+    await validateCompany(apiKey);
+
+    await employeeValidator.employee(employeeId);
+
+    const card: cardRepository.Card = await cardValidator.employeeCard(cardId, employeeId);
+
+    cardValidator.expiration(card["expirationDate"]);
+
+    cardValidator.isActive(card["password"]);
+
+    cardValidator.securityCode(card["securityCode"], CVC);
+
+    cardValidator.passwordSize(password);
+
+    await generateCardPassword(card["id"], password);
+
 };
-async function validateEmployeeNewCardType(cardType:any, employeeId:number){
-    const employeerCardboard : cardRepository.Card = await cardRepository.findByTypeAndEmployeeId(cardType, employeeId);
-    if(employeerCardboard) throw Error("Already have that type of card!");
+//Generate Card Password
+async function generateCardPassword(cardId: number, password: string) {
+    const encryptPassword: string = cryptr.encrypt(password);
+    await cardRepository.update(cardId, { password: encryptPassword });
 };
 
-//Generate Card
-function employeeCardName(employeeFullName:string){
-    const employeeCardName : string[] = employeeFullName.split(" ");
-    if(employeeCardName.length > 2){
-        return  employeeCardName
-                .filter(name => name[0].length > 3 && name[0] === name[0].toUpperCase())
-                .map((name, index, array) => index!==0 || index !== array.length - 1 ? name[0] : name)
-                .join(" ")
-    };
-    return  employeeFullName
-}
-function generateSecurityCode(){
-    const securityCode : string = faker.finance.creditCardCVV();
-    const encryptSecuritCode : string = cryptr.encrypt(securityCode);
-    return encryptSecuritCode
-}
-async function generateCard(employeeFullName:string, employeeId:number, type:TransactionTypes){
-    const number : string = faker.finance.creditCardNumber('visa');
-    const cardholderName : string = employeeCardName(employeeFullName);
-    const securityCode : string = generateSecurityCode();
-    const expirationDate : string = dayjs().add(5, "year").format("MM/YYYY");
 
-    await cardRepository.insert({
-        employeeId,
-        number,
-        cardholderName,
-        securityCode,
-        expirationDate,
-        isVirtual:false,
-        isBlocked:true,
-        type
-    });
-}
