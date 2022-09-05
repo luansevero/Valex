@@ -11,6 +11,7 @@ import * as cardRepository from "../repositories/cardRepository.js";
 import validateCompany from "../validators/companyValidator.js";
 import * as employeeValidator from "../validators/employeeValidator.js";
 import * as cardValidator from "../validators/cardValidator.js";
+import { number } from "joi";
 
 dotenv.config();
 
@@ -84,8 +85,8 @@ async function generateCardPassword(cardId: number, password: string) {
     await cardRepository.update(cardId, { password: encryptPassword });
 };
 
-//Block Card;
-export async function blockCard(apiKey: string, cardId:string | QueryString.ParsedQs | string[] | QueryString.ParsedQs[], employeeId: number, password: string){
+//Block Card && Unblock Card
+export async function toggleBlockedCard(apiKey: string, cardId:string | QueryString.ParsedQs | string[] | QueryString.ParsedQs[], employeeId: number, password: string, toBlock:boolean){
     await validateCompany(apiKey);
 
     await employeeValidator.employee(employeeId);
@@ -94,15 +95,13 @@ export async function blockCard(apiKey: string, cardId:string | QueryString.Pars
 
     cardValidator.expiration(card["expirationDate"]);
 
-    cardValidator.isBlocked(card["isBlocked"]);
+    cardValidator.status(card["isBlocked"], toBlock);
 
     cardValidator.confirmPassword(card["password"], password);
 
-    await blockEmployeeCard(Number(cardId))
+    await toggleCardStatus(Number(cardId), toBlock)
 }
-
-async function blockEmployeeCard(cardId:number){
-    await cardRepository.update(cardId, {isBlocked: false})
+async function toggleCardStatus(cardId:number, toBlock:boolean){
+    await cardRepository.update(cardId, {isBlocked: toBlock})
 }
-
 

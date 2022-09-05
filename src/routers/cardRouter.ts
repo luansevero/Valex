@@ -5,7 +5,8 @@ import * as cardController from "../controllers/cardController.js"
 const cardRouter = Router();
 
 cardRouter.post("/card/create", verifyApiKey, cardController.newCard);
-cardRouter.post("/card/active/:cardId", verifyApiKey, cardController.activation)
-cardRouter.post("/card/block/:cardId", verifyApiKey, cardController.blockCard)
+cardRouter.post("/card/active/:cardId", verifyApiKey, cardController.activation);
+cardRouter.post("/card/status/:cardId", verifyApiKey, cardController.toggleCardStatus);
+
 
 export default cardRouter;

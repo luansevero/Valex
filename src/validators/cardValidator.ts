@@ -37,9 +37,9 @@ export async function isActive(password:string){
 export async function passwordSize(password:string){
     if(password.length !== 4) throw Error("That password is invalid");
 };
-
-export async function isBlocked(isBlocked:boolean){
-    if(isBlocked) throw Error("Already blocked");
+//I don't know a better name
+export async function status(isBlocked:boolean, toBlock:boolean){
+    if(isBlocked === toBlock) throw Error(`Already ${isBlocked ? "blocked" : "unblocked"}`);
 };
 
 export async function confirmPassword(cardPassword:string, password:string){
